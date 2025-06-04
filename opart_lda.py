@@ -38,9 +38,8 @@ def opart(sequence, lda):
     tau_star = np.zeros(sequence_length+1, dtype=int)
     for t in range(1, sequence_length+1):
         V = C[:t] + lda + L(1 + np.arange(t), t, y, z)  # calculate set V
-        last_chpnt = np.argmin(V)                       # get optimal tau from set V
-        C[t] = V[last_chpnt]                            # update C_i
-        tau_star[t] = last_chpnt                        # update tau_star
+        C[t] = np.min(V)                                # update C_i
+        tau_star[t] = np.argmin(V)                      # update tau_star
 
     set_of_chpnt = trace_back(tau_star[1:])             # get set of changepoints
     return set_of_chpnt[1:-1] - 1
@@ -84,10 +83,9 @@ def lopart(sequence, neg_start, neg_end, pos_start, pos_end, lda):
     tau_star = np.zeros(sequence_length+1, dtype=int)
     for t in range(1, sequence_length+1):
         po_chpnt = get_T(t, neg_start+1, neg_end+1, pos_start+1, pos_end+1)     # get set of possible changepoint
-        V = C[po_chpnt] + lda + L(1 + po_chpnt, t, y, z)                # get set of possible value
-        last_chpnt = po_chpnt[np.argmin(V)]                             # get optimal tau from set V
-        C[t] = V[np.argmin(V)]                                          # update C_i
-        tau_star[t] = last_chpnt                                        # update tau_star
+        V = C[po_chpnt] + lda + L(1 + po_chpnt, t, y, z)                        # get set of possible value
+        C[t] = np.min(V)                                                        # update C_i
+        tau_star[t] = po_chpnt[np.argmin(V)]                                    # update tau_star
 
     # get set of changepoints
     set_of_chpnt = trace_back(tau_star[1:])
